@@ -6,7 +6,7 @@ MODULE mod_adapt
   IMPLICIT NONE
 REAL, POINTER :: W(:,:), T(:,:)
 REAL, POINTER :: SC(:,:), SP(:,:)
-REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM, T_ref
+REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM
 contains
    subroutine aliasar_campos()
    
@@ -24,8 +24,8 @@ contains
 
     call INTA2(NZX, 1, NCVX(1), 5)
     call DATA2(XZONE(1), 1.0, POWRX(1), 1.2)
-    call INTA3(NZY, 2, NCVY(1), 5, NCVY(2), 5)
-    call DATA4(YZONE(1), 0.5, YZONE(2), 0.5, POWRY(1), 1.2, POWRY(2), -1.2)
+    call INTA2(NZY, 2, NCVY(1), 10)
+    call DATA2(YZONE(1), 1.0, POWRY(1), 1.2)
     call ZGRID
 
     
@@ -45,7 +45,7 @@ contains
     DO N=1,4
      KPRINT(N) = 1
     END DO
-    call DATA7(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 0.1, T_ref, 0.)
+    call DATA6(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 1.)
     RHOCP = DEN * CP
     do j = 1, M1
       T(1,j) = 1.0
@@ -160,17 +160,16 @@ end if
     end if
 
     do j = 2, M2
-      KBCL1(j) = 2
+      KBCL1(j) = 1
     end do
 
     if (NF == 2) then
       do j = 2, M2
-        KBCI1(j) = 2
+        KBCI1(j) = 1
       end do
       do i = 2, L2
-        KBCJ1(i) = 2
-        FLXCJ1(i) = QW * (T(i,1) - T_ref) 
-        KBCM1(i) = 2
+        KBCJ1(i) = 1
+        KBCM1(i) = 1
       end do
     end if
 

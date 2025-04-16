@@ -6,7 +6,7 @@ MODULE mod_adapt
   IMPLICIT NONE
 REAL, POINTER :: W(:,:), T(:,:)
 REAL, POINTER :: SC(:,:), SP(:,:)
-REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM, T_ref
+REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM
 contains
    subroutine aliasar_campos()
    
@@ -33,7 +33,7 @@ contains
   end subroutine grid
 
   subroutine begin()
-    INTEGER :: N, i, j
+    INTEGER :: N
     TITLE(1) = ' AXIAL VELOCITY W '
     TITLE(2) = '   TEMPERATURE    '
     TITLE(3) = '      W/WBAR      '
@@ -45,16 +45,8 @@ contains
     DO N=1,4
      KPRINT(N) = 1
     END DO
-    call DATA7(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 0.1, T_ref, 0.)
+    call DATA6(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 1.)
     RHOCP = DEN * CP
-    do j = 1, M1
-      T(1,j) = 1.0
-      T(L1,j) = 1.0
-    end do
-    do i = 1, L1
-      T(i,1) = 1.0
-      T(i,M1) = 1.0
-end do
   end subroutine begin
 
   subroutine output()
@@ -169,7 +161,7 @@ end if
       end do
       do i = 2, L2
         KBCJ1(i) = 2
-        FLXCJ1(i) = QW * (T(i,1) - T_ref) 
+        FLXCJ1(i) = QW
         KBCM1(i) = 2
       end do
     end if
