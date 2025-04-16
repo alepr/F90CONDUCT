@@ -6,7 +6,7 @@ MODULE mod_adapt
   IMPLICIT NONE
 REAL, POINTER :: W(:,:), T(:,:)
 REAL, POINTER :: SC(:,:), SP(:,:)
-REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM
+REAL :: DPDZ, AMU, COND, CP, DEN, QW, RHOCP, WSUM, T_ref
 contains
    subroutine aliasar_campos()
    
@@ -33,9 +33,9 @@ contains
   end subroutine grid
 
   subroutine begin()
-    INTEGER :: N
+    INTEGER :: N, i, j
     TITLE(1) = ' AXIAL VELOCITY W '
-    TITLE(2) = '   CONCENTRATION    '
+    TITLE(2) = '   TEMPERATURE    '
     TITLE(3) = '      W/WBAR      '
     TITLE(4) = '(T-TWAV)/(TB-TWAV)'
 
@@ -45,13 +45,14 @@ contains
     DO N=1,4
      KPRINT(N) = 1
     END DO
-    call DATA6(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 1.)
+    call DATA7(AMU, 1., COND, 1., CP, 1., DEN, 1., DPDZ, -1., QW, 0.1, T_ref, 1.)
     RHOCP = DEN * CP
+
   end subroutine begin
 
   subroutine output()
     integer :: iunit, i, j
-    REAL :: AR, ASUM, TSUM, WBAR, TB, WP, DH, RE, FRE
+    REAL :: AR, ASUM, TSUM, WBAR, TB, WP, DH, RE, FRE, FLUX_MEDIO
     REAL :: TWAV, ANU, ANULOC    
     if (ITER == 3) then
       KSOLVE(1) = 0
@@ -61,6 +62,12 @@ contains
     ASUM = 0.
     WSUM = 0.
     TSUM = 0.
+   
+    FLUX_MEDIO = 0.0
+    do i = 2, L2
+      FLUX_MEDIO = FLUX_MEDIO + XCV(i) * FLXCJ1(i)
+    end do
+    FLUX_MEDIO = FLUX_MEDIO / X(L1)
 
     do j = 2, M2
       do i = 2, L2
@@ -86,20 +93,20 @@ contains
       TWAV = TWAV + XCV(i) * T(i,1)
     end do
     TWAV = TWAV / X(L1)
-    ANU = QW * DH / (COND * (TWAV - TB) + SMALL)
+    ANU = FLUX_MEDIO * DH / (COND * (TWAV - TB) + SMALL)
 
     do iunit = IU1, IU2
-      if (ITER == 0) write(iunit, '(2X,"ITER",4X,"W(5,8)",4X,"W(3,7)",4X,"T(5,8)",4X,"T(3,7)",5X,"FRE",8X,"SH")')
+      if (ITER == 0) write(iunit, '(2X,"ITER",4X,"W(5,8)",4X,"W(3,7)",4X,"T(5,8)",4X,"T(3,7)",5X,"FRE",8X,"NU")')
       write(iunit, '(3X,I2,2X,1P6E10.2)') ITER, W(5,8), W(3,7), T(5,8), T(3,7), FRE, ANU
     end do
-
+    print *, "TWAV", TWAV
     if (ITER == LAST) then
       do i = 2, L2
         
         
-        ANULOC = QW * DH / (COND * (T(i,1) - TB) + SMALL)
+        ANULOC = FLXCJ1(i) * DH / (COND * (T(i,1) - TB) + SMALL)
         do iunit = IU1, IU2
-          if (i == 2) write(iunit, '(//,"  I",8X,"X(I)",7X,"LOCAL SH (BOTTOM WALL)")')
+          if (i == 2) write(iunit, '(//,"  I",8X,"X(I)",7X,"LOCAL NU (BOTTOM WALL)")')
           write(iunit, '(1X,I2,5X,1PE9.2,11X,1PE9.2)') i, X(i), ANULOC
         end do
       end do
@@ -107,7 +114,7 @@ contains
       do j = 1, M1
         do i = 1, L1
           F(i,j,3) = W(i,j) / WBAR
-          F(i,j,4) = (T(i,j) - TWAV) / (TB - TWAV)
+          F(i,j,4) = (T(i,j) - T_ref) / (TWAV - T_ref)
         end do
       end do
 
@@ -161,7 +168,7 @@ end if
       end do
       do i = 2, L2
         KBCJ1(i) = 2
-        FLXCJ1(i) = QW
+        FLXCJ1(i) = QW * (T_ref-T(i,1)) 
         KBCM1(i) = 2
       end do
     end if
