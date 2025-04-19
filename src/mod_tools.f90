@@ -41,7 +41,7 @@ CONTAINS
     INTEGER :: nz, i, j, i1, i2, ilast, j1, j2, jlast
     REAL :: dd, fcvlx, fcvly
 
-    XU(2) = 0.0
+    XU(2) = 0.
     i2 = 2
     DO nz = 1, NZX
       fcvlx = REAL(NCVX(nz))
@@ -59,7 +59,7 @@ CONTAINS
     END DO
     L1 = i2
 
-    YV(2) = 0.0
+    YV(2) = 0.
     j2 = 2
     DO nz = 1, NZY
       fcvly = REAL(NCVY(nz))
