@@ -128,10 +128,10 @@ CONTAINS
           DO k = 1, irep
             incr = MIN(6, iend - ibeg)
             istop = ibeg + incr
-            WRITE(iunit,'(/"  I =",I6,6I9)') (i, i = ibeg, istop)
+            WRITE(iunit,'(/"  I =",I8,6I10)') (i, i = ibeg, istop)
             WRITE(iunit,'("  J")')
             DO j = jend, jbeg, -1
-              WRITE(iunit,'(1X,I2,3X,1P7E9.2)') j, (F(i,j,n), i = ibeg, istop)
+              WRITE(iunit,'(1X,I2,3X,1P7E10.2)') j, (F(i,j,n), i = ibeg, istop)
             END DO
             ibeg = istop + 1
           END DO
@@ -176,5 +176,52 @@ CONTAINS
     CLOSE(8)
   END SUBROUTINE plot
   
+  
+  SUBROUTINE plotvts 
+  INTEGER :: i, j   
+  INTEGER :: nvar  
+  INTEGER :: unit
+  
+  unit = 9
+  OPEN(unit=unit, FILE='grid.vts', STATUS='REPLACE')
+
+  WRITE(unit,'(A)') '<?xml version="1.0"?>'
+  WRITE(unit,'(A)') '<VTKFile type="StructuredGrid" version="0.1" byte_order="LittleEndian">'
+  WRITE(unit,'(A,I0,A,I0,A)') '  <StructuredGrid WholeExtent="0 ',L1-1,' 0 ',M1-1,' 0 0">'
+  WRITE(unit,'(A,I0,A,I0,A)') '    <Piece Extent="0 ',L1-1,' 0 ',M1-1,' 0 0">'
+  
+  WRITE(unit,'(A)') '      <Points>'
+  WRITE(unit,'(A)') '        <DataArray type="Float32" NumberOfComponents="3" format="ascii">'
+  DO j = 1, M1
+     DO i = 1, L1
+        WRITE(unit,'(3F12.6)') X(i), Y(j), 0.0
+     END DO
+  END DO
+  WRITE(unit,'(A)') '        </DataArray>'
+  WRITE(unit,'(A)') '      </Points>'
+
+  
+  WRITE(unit,'(A)') '      <PointData>'
+
+  DO nvar = 1, NFMAX
+    IF (KPRINT(nvar) /= 0) THEN
+      WRITE(unit,'(A,A,A)') '        <DataArray type="Float32" Name="', TRIM(VTKTITLE(nvar)), '" format="ascii">'
+      DO j = 1, M1
+          DO i = 1, L1
+            WRITE(unit,'(F12.6)') F(i,j,nvar)
+          END DO
+      END DO
+      WRITE(unit,'(A)') '        </DataArray>'
+    END IF
+  END DO
+
+  WRITE(unit,'(A)') '      </PointData>'
+  WRITE(unit,'(A)') '    </Piece>'
+  WRITE(unit,'(A)') '  </StructuredGrid>'
+  WRITE(unit,'(A)') '</VTKFile>'
+
+  CLOSE(unit)
+END SUBROUTINE plotvts
+
 
 END MODULE mod_tools

@@ -7,7 +7,7 @@ gfortran -c src/conduct_common.f90
 gfortran -c src/mod_values.f90
 gfortran -c src/mod_init.f90
 gfortran -c src/mod_tools.f90
-gfortran -c src/mod_adapt.f90
+gfortran -c mod_adapt.f90
 gfortran -c src/mod_solver.f90
 
 echo === Enlazando todo en conduct.exe ===

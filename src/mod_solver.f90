@@ -294,11 +294,7 @@ END SUBROUTINE heart
               QTX(i) = (temp + AIM(i,j)*QTX(i-1)) / denom
             
             END DO
-            if (i == 5 .and. j == 5) then
-      print *, 'AP(5,5) = ', AP(5,5)
-      print *, 'CON(5,5) = ', CON(5,5)
-      print *, 'GAM(5,5) = ', GAM(5,5)
-      print *, 'F(5,5,n) = ', F(5,5,n)
+            if (i == 5 .and. j == 5) then      
     end if
             DO i = L2, 2, -1
               F(i,j,n) = F(i+1,j,n)*PTX(i) + QTX(i)

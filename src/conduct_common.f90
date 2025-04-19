@@ -1,7 +1,7 @@
 
 MODULE conduct_common
   IMPLICIT NONE
-  INTEGER, PARAMETER :: NI = 52, NJ = 52, NFMAX = 5, NZMAX = 10
+  INTEGER, PARAMETER :: NI = 52, NJ = 52, NFMAX = 10, NZMAX = 10
   
   
   ! Parámetros
@@ -9,10 +9,12 @@ MODULE conduct_common
 
   ! Variables compartidas
   CHARACTER(LEN=18) :: TITLE(NFMAX)
+  CHARACTER(LEN=18) :: VTKTITLE(NFMAX)
   CHARACTER(LEN=64) :: HEADER, PRINTF, PLOTF
   REAL, TARGET, DIMENSION(NI,NJ,NFMAX) :: F
 
   REAL :: ALAM(NI,NJ), GAM(NI,NJ)
+  REAL, POINTER :: SC(:,:), SP(:,:)
   REAL, TARGET :: CON(NI,NJ), AP(NI,NJ)
   REAL :: AIP(NI,NJ), AIM(NI,NJ), AJP(NI,NJ), AJM(NI,NJ)
   INTEGER :: IBLOCK(NI,NJ)
@@ -45,4 +47,9 @@ MODULE conduct_common
   REAL :: XZONE(NZMAX), YZONE(NZMAX)
   REAL :: POWERX, POWERY
   SAVE
+  CONTAINS
+    SUBROUTINE EQUIVAL()
+      SC => CON
+      SP => AP
+    END SUBROUTINE
 END MODULE conduct_common

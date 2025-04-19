@@ -11,7 +11,6 @@ PROGRAM main_conduct
   ! Fase de inicialización
   
   CALL deflt()
-  call aliasar_campos()
   CALL grid()
   CALL ready()
   CALL begin()
